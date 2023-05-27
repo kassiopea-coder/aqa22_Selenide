@@ -19,20 +19,17 @@ import static com.codeborne.selenide.Selenide.*;
 
 class DeliveryCardTest {
 
-    String generateDate(int datesToAdd, String pattern) {
+    public String generateDate(int datesToAdd, String pattern) {
         return LocalDate.now().plusDays(datesToAdd).format(DateTimeFormatter.ofPattern(pattern));
     }
 
     @BeforeEach
     void setUp() {
-
         open("http://localhost:9999");
-
     }
 
     @Test
     void shouldRegisterWithTrueInform() {
-        //Configuration.holdBrowserOpen = true;
         $("[data-test-id=city] input").setValue("Саратов");
         $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         $("[data-test-id=date] input").setValue(generateDate(3, "dd.MM.yyyy"));
@@ -41,11 +38,13 @@ class DeliveryCardTest {
         $("[data-test-id=agreement]").click();
         $$("button").find(exactText("Забронировать")).click();
         $(withText("Успешно!")).shouldBe(visible, Duration.ofSeconds(15));
+        $(".notification__content")
+                .shouldHave(text("Встреча успешно забронирована на " + generateDate(3, "dd.MM.yyyy")), Duration.ofSeconds(15))
+                .shouldBe(visible);
     }
 
     @Test
     void shouldRegisterWithInvalidCity() {
-        //Configuration.holdBrowserOpen = true;
         $("[data-test-id=city] input").setValue("Ялта");
         $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         $("[data-test-id=date] input").setValue(generateDate(3, "dd.MM.yyyy"));
@@ -60,7 +59,6 @@ class DeliveryCardTest {
 
     @Test
     void shouldRegisterWithInvalidDate() {
-        //Configuration.holdBrowserOpen = true;
         $("[data-test-id=city] input").setValue("Саратов");
         $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         $("[data-test-id=date] input").setValue(generateDate(2, "dd.MM.yyyy"));
@@ -71,13 +69,11 @@ class DeliveryCardTest {
 
         String expected = "Заказ на выбранную дату невозможен";
         String actual = $(By.cssSelector("[data-test-id=date] .input_invalid .input__sub")).getText().trim();
-        //$x("//span[@data-test-id='date']//span[contains(text(),'Заказ на выбранную дату невозможен')]").should(appear);
     }
 
 
     @Test
     void shouldRegisterWithInvalidName() {
-        //Configuration.holdBrowserOpen = true;
         $("[data-test-id=city] input").setValue("Москва");
         $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         $("[data-test-id=date] input").setValue(generateDate(3, "dd.MM.yyyy"));
@@ -92,7 +88,6 @@ class DeliveryCardTest {
 
     @Test
     void shouldRegisterWithInvalidPhone() {
-        //Configuration.holdBrowserOpen = true;
         $("[data-test-id=city] input").setValue("Москва");
         $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         $("[data-test-id=date] input").setValue(generateDate(3, "dd.MM.yyyy"));
